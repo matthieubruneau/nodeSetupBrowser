@@ -1,10 +1,9 @@
 import sys
-import time
-from PySide2 import QtGui
-from PySide2 import QtCore
+import datetime
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt
 from . import utils
+from collections import OrderedDict
 import hou
 
 
@@ -88,12 +87,16 @@ class NodesBrowser(QtWidgets.QWidget):
             context = node.type().category().name() if node.type().category().name() != 'Object' else node.type().name()
             self.addNode.label.setText(context)
             if self.addNode.exec_():
-                self.newNodeData = {'name': self.addNode.nodeSetupName.text(), 'type': self.addNode.label.text(),
-                                    'comment': self.addNode.metadata.toPlainText()}
+                self.newNodeData = OrderedDict([('name', self.addNode.nodeSetupName.text()),
+                                                ('type', self.addNode.label.text()),
+                                                ('date', datetime.date.strftime(datetime.date.today(), '%m/%d/%y')),
+                                                ('comment', self.addNode.metadata.toPlainText())])
                 self.exportNode(selectedNodes, self.newNodeData)
 
     @staticmethod
     def exportNode(nodes, nodeData):
+        utils.serialize(nodeData)
         parentNode = nodes[0].parent()
         path = utils.path + nodeData['name'] + utils.extension
-        print(parentNode)
+
+
