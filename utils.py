@@ -247,22 +247,22 @@ class NodeModel(QtCore.QAbstractItemModel):
 
 class ProxyModel(QtCore.QSortFilterProxyModel):
     def filterAcceptsRow(self, source_row, source_parent):
-        # user = ''
-        # widget = self.parent()
-        # model = self.sourceModel()
-        # sourceData = model.index(source_row, 0, source_parent).data()
-        # filterName = self.parent().filter.text()
-        # sourceParent = source_parent.data()
+        user = ''
+        widget = self.parent()
+        model = self.sourceModel()
+        sourceData = model.index(source_row, 0, source_parent).data()
+        filterName = self.parent().filter.text()
+        sourceParent = source_parent.data()
 
-        # if sourceParent is not None:
-        #     data = deserialize(path)
-        #     try:
-        #         if filterName in data['Categories'][sourceParent][sourceData]['comment']:
-        #             return True
-        #     except KeyError:
-        #         return True
-        #     if filterName == '':
-        #         return True
+        if sourceParent is not None:
+            data = deserialize(path)
+            try:
+                if filterName in data['Categories'][sourceParent][sourceData]['comment']:
+                    return True
+            except KeyError:
+                return True
+            if filterName == '':
+                return True
 
         return True
 
