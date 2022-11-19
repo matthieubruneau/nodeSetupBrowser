@@ -60,28 +60,24 @@ class NodesBrowser(QtWidgets.QWidget):
         # Create Tree View and Configure it
         self.treeView = QtWidgets.QTreeView()
         self.treeView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        # self.treeView.setHeaderHidden(True)
 
         self.model = utils.NodeModel()
         self.proxyModel = utils.ProxyModel(self, recursiveFilteringEnabled=True)
         self.proxyModel.setSourceModel(self.model)
+        self.proxyModel.setHeaderData(0, QtCore.Qt.Horizontal, 'test', QtCore.Qt.DisplayRole)
 
         self.treeView.setModel(self.model)
-        self.treeView.header().setDefaultAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        self.treeView.selectionModel().selectionChanged.connect(self.selectedNode)
+        header = utils.Headers(QtCore.Qt.Horizontal)
 
-        self.metadata = QtWidgets.QPlainTextEdit()
-        # self.metadata.setReadOnly(True)
-        # self.metadata.setFixedWidth(250)
+        self.treeView.setHeader(header)
+        self.treeView.selectionModel().selectionChanged.connect(self.selectedNode)
 
         refresh = QtWidgets.QPushButton('Refresh Window')
         copy = QtWidgets.QPushButton('Export Node Selection')
         paste = QtWidgets.QPushButton('Import Node Setup')
         delete = QtWidgets.QPushButton('Delete Node Setup')
 
-        # grid.addWidget(self.filter, 1, 1, 1, 3)
         grid.addWidget(self.treeView, 2, 1, 4, 4)
-        # grid.addWidget(self.metadata, 2, 4, 2, 1)
         grid.addWidget(refresh, 6, 1, 1, 4)
         grid.addWidget(copy, 7, 1, 1, 1)
         grid.addWidget(paste, 7, 2, 1, 2)
@@ -97,6 +93,7 @@ class NodesBrowser(QtWidgets.QWidget):
 
         # Connect custom signals
         self.removeSignal.connect(self.model.removeData)
+
 
     @QtCore.Slot(str)
     def onFilterChanged(self, text):
@@ -150,7 +147,6 @@ class NodesBrowser(QtWidgets.QWidget):
 
                 self.exportNode(selectedNodes, self.newNodeData)
 
-
     def selectedNode(self, selected, deselected):
         index = selected.indexes()
         try:
@@ -158,11 +154,6 @@ class NodesBrowser(QtWidgets.QWidget):
             parent = index[0].parent().data()
             if parent is not None and parent != 'Categories':
                 data = utils.deserialize(utils.path)
-
-                node = data['Categories'][parent][selectionData]
-            #     text = "\n".join(["date: {}".format(node['date']), "user: {}".format(node['user']),
-            #                       "description: {}".format(node['comment'])])
-            #     self.metadata.setPlainText(text)
         except IndexError or KeyError:
             pass
 
@@ -188,20 +179,16 @@ class NodesBrowser(QtWidgets.QWidget):
             if parent is not None:
                 jsonPath = f"{utils.path}{parent}_nodes.json"
                 data = utils.deserialize(jsonPath, allType=False)
-                nodePath = data['Categories'][parent][selectionData][-1]
 
+                nodePath = data['Categories'][parent][selectionData][-1]
                 # nodes = self.proxyModel.mapToSource(selection).internalPointer()
                 nodes = selection.internalPointer()
                 node = utils.Node(nodes, selection.parent())
 
                 # Update json
                 del data['Categories'][parent][selectionData]
+                keys = ['user', 'date', 'comment', 'Node Path']
                 utils.updateJson(data, jsonPath)
 
                 self.removeSignal.emit(node)
                 os.remove(nodePath)
-
-                # Set metadata to empty
-                self.metadata.setPlainText('')
-
-

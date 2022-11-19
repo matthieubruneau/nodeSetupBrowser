@@ -1,6 +1,6 @@
 import json
 import uuid
-from PySide2 import QtCore
+from PySide2 import QtCore, QtWidgets, QtGui
 import os
 import hou
 
@@ -29,6 +29,10 @@ def writeJson(newData, filePath):
 
 
 def updateJson(newData, filePath):
+    tmpData = newData['Categories']
+    for key, value in tmpData.items():
+        for subkey, subvalue in value.items():
+            newData['Categories'][key][subkey] = dict(zip(['user', 'date', 'comment', 'Node Path'], subvalue))
     if os.path.exists(filePath):
         with open(filePath, 'w') as file:
             json.dump(newData, file, indent=4)
@@ -67,6 +71,22 @@ def getCurrentNetworkTab():
             if tab.isCurrentTab():
                 return tab
     return None
+
+
+class Headers(QtWidgets.QHeaderView):
+    def __init__(self, orientation):
+        super(Headers, self).__init__(orientation)
+        self.setStretchLastSection(True)
+
+    def mousePressEvent(self, e):
+        if e.button() == QtCore.Qt.LeftButton:
+            print('Left clicked')
+
+
+class Node(object):
+    def __init__(self, nodes, parent):
+        self.node = nodes
+        self.parent = parent
 
 
 class NodeItem(object):
@@ -109,6 +129,12 @@ class NodeItem(object):
         return 0
 
 
+class Node(object):
+    def __init__(self, node, parent):
+        self.node = node
+        self.parent = parent
+
+
 class NodeModel(QtCore.QAbstractItemModel):
     def __init__(self, parent=None):
         super(NodeModel, self).__init__(parent)
@@ -135,11 +161,12 @@ class NodeModel(QtCore.QAbstractItemModel):
             return None
 
         if role == QtCore.Qt.SizeHintRole:
-            return QtCore.QSize(10000, 2000)
+            return QtCore.QSize(100, 2000)
 
         item = index.internalPointer()
 
         return item.data(index.column())
+
 
     def flags(self, index):
         if not index.isValid():
@@ -189,7 +216,8 @@ class NodeModel(QtCore.QAbstractItemModel):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             return self.columnsHeader[section]
 
-        return super(NodeModel, self).headerData(section, orientation, role)
+        # Set default header data
+        # return super(NodeModel, self).headerData(section, orientation, role)
 
     def addNewData(self, data):
         children = [child.data(0) for child in self.rootItem.childItems]
@@ -247,22 +275,14 @@ class NodeModel(QtCore.QAbstractItemModel):
 
 class ProxyModel(QtCore.QSortFilterProxyModel):
     def filterAcceptsRow(self, source_row, source_parent):
-        user = ''
-        widget = self.parent()
-        model = self.sourceModel()
-        sourceData = model.index(source_row, 0, source_parent).data()
-        filterName = self.parent().filter.text()
-        sourceParent = source_parent.data()
-
-        if sourceParent is not None:
-            data = deserialize(path)
-            try:
-                if filterName in data['Categories'][sourceParent][sourceData]['comment']:
-                    return True
-            except KeyError:
-                return True
-            if filterName == '':
-                return True
+        # user = ''
+        # widget = self.parent()
+        # model = self.sourceModel()
+        # sourceData = model.index(source_row, 0, source_parent).data()
+        # sourceParent = source_parent.data()
+        #
+        # if sourceParent is not None:
+        #     data = deserialize(path)
 
         return True
 
