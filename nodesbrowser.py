@@ -1,10 +1,11 @@
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets, QtCore
 from . import utils
+from . import treemodel
+
 from collections import OrderedDict
 from datetime import date
 import os
 import hou
-import json
 
 
 class Export(QtWidgets.QDialog):
@@ -61,13 +62,13 @@ class NodesBrowser(QtWidgets.QWidget):
         self.treeView = QtWidgets.QTreeView()
         self.treeView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 
-        self.model = utils.NodeModel()
-        self.proxyModel = utils.ProxyModel(self, recursiveFilteringEnabled=True)
+        self.model = treemodel.NodeModel()
+        self.proxyModel = treemodel.ProxyModel(self, recursiveFilteringEnabled=True)
         self.proxyModel.setSourceModel(self.model)
         self.proxyModel.setHeaderData(0, QtCore.Qt.Horizontal, 'test', QtCore.Qt.DisplayRole)
 
-        self.treeView.setModel(self.model)
-        header = utils.Headers(QtCore.Qt.Horizontal)
+        self.treeView.setModel(self.proxyModel)
+        header = treemodel.Headers(QtCore.Qt.Horizontal)
 
         self.treeView.setHeader(header)
         self.treeView.selectionModel().selectionChanged.connect(self.selectedNode)
@@ -82,6 +83,7 @@ class NodesBrowser(QtWidgets.QWidget):
         grid.addWidget(copy, 7, 1, 1, 1)
         grid.addWidget(paste, 7, 2, 1, 2)
         grid.addWidget(delete, 7, 4, 1, 1)
+        grid.addWidget(self.filter, 8, 1, 1, 2)
 
         mainLayout.addLayout(grid)
 
@@ -98,7 +100,6 @@ class NodesBrowser(QtWidgets.QWidget):
     @QtCore.Slot(str)
     def onFilterChanged(self, text):
         self.proxyModel.setFilterRegExp(text)
-        # self.treeView.expandAll()
 
     @staticmethod
     def getCurrentNetworkTab():
@@ -109,7 +110,7 @@ class NodesBrowser(QtWidgets.QWidget):
                     return tab
 
     def refreshWindow(self):
-        self.model = utils.NodeModel()
+        self.model = treemodel.NodeModel()
         self.treeView.setModel(self.model)
         self.treeView.selectionModel().selectionChanged.connect(self.selectedNode)
 
@@ -181,9 +182,9 @@ class NodesBrowser(QtWidgets.QWidget):
                 data = utils.deserialize(jsonPath, allType=False)
 
                 nodePath = data['Categories'][parent][selectionData][-1]
-                # nodes = self.proxyModel.mapToSource(selection).internalPointer()
-                nodes = selection.internalPointer()
-                node = utils.Node(nodes, selection.parent())
+                nodes = self.proxyModel.mapToSource(selection).internalPointer()
+                # nodes = selection.internalPointer()
+                node = treemodel.Node(nodes, selection.parent())
 
                 # Update json
                 del data['Categories'][parent][selectionData]
