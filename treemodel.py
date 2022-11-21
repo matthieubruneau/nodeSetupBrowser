@@ -3,14 +3,14 @@ from . import utils
 import os
 
 
-class Headers(QtWidgets.QHeaderView):
-    def __init__(self, orientation):
-        super(Headers, self).__init__(orientation)
-        self.setStretchLastSection(True)
-
-    def mousePressEvent(self, e):
-        if e.button() == QtCore.Qt.LeftButton:
-            print('Left clicked')
+# class Headers(QtWidgets.QHeaderView):
+#     def __init__(self, orientation):
+#         super(Headers, self).__init__(orientation)
+#         self.setStretchLastSection(True)
+#
+#     def mousePressEvent(self, e):
+#         if e.button() == QtCore.Qt.LeftButton:
+#             print('Left clicked')
 
 
 class NodeItem(object):
@@ -90,7 +90,6 @@ class NodeModel(QtCore.QAbstractItemModel):
         item = index.internalPointer()
 
         return item.data(index.column())
-
 
     def flags(self, index):
         if not index.isValid():

@@ -1,6 +1,9 @@
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore, QtGui
+
 from . import utils
 from . import treemodel
+from . import filtering
+from .Resources import resource
 
 from collections import OrderedDict
 from datetime import date
@@ -55,35 +58,40 @@ class NodesBrowser(QtWidgets.QWidget):
         # Main layout
         grid = QtWidgets.QGridLayout()
 
-        # Filter QLine Edit
-        self.filter = QtWidgets.QLineEdit('')
+        filterList = filtering.CheckableComboBox()
+        filterList.setFixedHeight(20)
 
-        # Create Tree View and Configure it
-        self.treeView = QtWidgets.QTreeView()
-        self.treeView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-
+        # Tree Model
         self.model = treemodel.NodeModel()
         self.proxyModel = treemodel.ProxyModel(self, recursiveFilteringEnabled=True)
         self.proxyModel.setSourceModel(self.model)
         self.proxyModel.setHeaderData(0, QtCore.Qt.Horizontal, 'test', QtCore.Qt.DisplayRole)
 
+        # Create Tree View and Configure it
+        self.treeView = QtWidgets.QTreeView()
+        self.treeView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.treeView.setModel(self.proxyModel)
-        header = treemodel.Headers(QtCore.Qt.Horizontal)
-
-        self.treeView.setHeader(header)
         self.treeView.selectionModel().selectionChanged.connect(self.selectedNode)
 
+        # Buttons
         refresh = QtWidgets.QPushButton('Refresh Window')
         copy = QtWidgets.QPushButton('Export Node Selection')
-        paste = QtWidgets.QPushButton('Import Node Setup')
-        delete = QtWidgets.QPushButton('Delete Node Setup')
+        addIcon = QtGui.QIcon(":/icons/add.png")
+        copy.setIcon(addIcon)
 
+        paste = QtWidgets.QPushButton('Import Node Setup')
+
+        delete = QtWidgets.QPushButton('Delete Node Setup')
+        deleteIcon = QtGui.QIcon(":/icons/minus.png")
+        delete.setIcon(deleteIcon)
+
+        # Set layout
+        grid.addWidget(filterList, 1, 1, 1, 1)
         grid.addWidget(self.treeView, 2, 1, 4, 4)
         grid.addWidget(refresh, 6, 1, 1, 4)
         grid.addWidget(copy, 7, 1, 1, 1)
         grid.addWidget(paste, 7, 2, 1, 2)
         grid.addWidget(delete, 7, 4, 1, 1)
-        grid.addWidget(self.filter, 8, 1, 1, 2)
 
         mainLayout.addLayout(grid)
 
@@ -91,7 +99,6 @@ class NodesBrowser(QtWidgets.QWidget):
         paste.clicked.connect(self.importNode)
         delete.clicked.connect(self.removeData)
         refresh.clicked.connect(self.refreshWindow)
-        self.filter.textChanged.connect(self.onFilterChanged)
 
         # Connect custom signals
         self.removeSignal.connect(self.model.removeData)
