@@ -58,8 +58,11 @@ class NodesBrowser(QtWidgets.QWidget):
         # Main layout
         grid = QtWidgets.QGridLayout()
 
+        testModel = filtering.ListModel()
+
         filterList = filtering.CheckableComboBox()
         filterList.setFixedHeight(20)
+        filterList.setModel(testModel)
 
         # Tree Model
         self.model = treemodel.NodeModel()

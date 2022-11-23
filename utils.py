@@ -47,8 +47,12 @@ def createData(file, data):
         nodeData = json.load(f)
     tmpData = nodeData['Categories']
     nodeType = list(tmpData.keys())[0]
-    nodes = {k: list(v.values()) for k, v in tmpData[nodeType].items()}
+
+    nodes = dict()
+    for key, value in tmpData[nodeType].items():
+        nodes[key] = [value['user'], value['date'], value['comment'], value['Node Path']]
     data['Categories'][nodeType] = nodes
+
 
 
 def deserialize(filepath, allType=True):

@@ -151,12 +151,12 @@ class NodeModel(QtCore.QAbstractItemModel):
         if category not in children:
             node = NodeItem(category, self.rootItem)
             nodeExport = NodeItem(list(data[category].values()), node)
-            self.layoutAboutToBeChanged.emit()
+            self.beginResetModel()
             self.beginInsertRows(QtCore.QModelIndex(), rows, rows)
             self.rootItem.appendChild(node)
             node.appendChild(nodeExport)
             self.endInsertRows()
-            self.layoutChanged.emit()
+            self.endResetModel()
         else:
             nodeType = list(data.keys())[0]
             parent = self.match(self.index(0, 0, QtCore.QModelIndex()), 0, nodeType, 1)
@@ -165,11 +165,11 @@ class NodeModel(QtCore.QAbstractItemModel):
                 parentNode = parentIndex.internalPointer()
                 rows = parentNode.childCount()
                 dataNode = NodeItem(list(data[category].values()), parentNode)
-                self.layoutAboutToBeChanged.emit()
+                self.beginResetModel()
                 self.beginInsertRows(parentIndex, rows, rows)
                 parentNode.appendChild(dataNode)
                 self.endInsertRows()
-                self.layoutChanged.emit()
+                self.endResetModel()
 
     @QtCore.Slot(object)
     def removeData(self, node):
@@ -177,11 +177,11 @@ class NodeModel(QtCore.QAbstractItemModel):
         # nodeIndex = self.index(nodedata.row(), 0, QtCore.QModelIndex())
         row = nodedata.row()
         parent = nodedata.parent()
-        self.layoutAboutToBeChanged.emit()
+        self.beginResetModel()
         self.beginRemoveRows(node.parent, row, row)
         parent.removeChild(nodedata)
         self.endRemoveRows()
-        self.layoutChanged.emit()
+        self.endResetModel()
         if parent.childCount() == 0:
             self.beginRemoveRows(QtCore.QModelIndex(), 0, 0)
             self.rootItem.removeChild(parent)
