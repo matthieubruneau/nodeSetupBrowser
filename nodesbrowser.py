@@ -45,6 +45,7 @@ class Export(QtWidgets.QDialog):
 
 class NodesBrowser(QtWidgets.QWidget):
     removeSignal = QtCore.Signal(object)
+    updateFilterList = QtCore.Signal()
 
     def __init__(self):
         super(NodesBrowser, self).__init__()
@@ -58,11 +59,12 @@ class NodesBrowser(QtWidgets.QWidget):
         # Main layout
         grid = QtWidgets.QGridLayout()
 
-        testModel = filtering.ListModel()
+        filterModel = filtering.ListModel()
 
-        filterList = filtering.CheckableComboBox()
-        filterList.setFixedHeight(20)
-        filterList.setModel(testModel)
+        self.filterList = QtWidgets.QComboBox()
+        self.filterList.setFixedHeight(20)
+        self.filterList.setModel(filterModel)
+        self.filterList.currentIndexChanged.connect(lambda: self.onFilterChanged(self.filterList.currentText()))
 
         # Tree Model
         self.model = treemodel.NodeModel()
@@ -74,6 +76,7 @@ class NodesBrowser(QtWidgets.QWidget):
         self.treeView = QtWidgets.QTreeView()
         self.treeView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.treeView.setModel(self.proxyModel)
+        # self.treeView.setModel(self.model)
         self.treeView.selectionModel().selectionChanged.connect(self.selectedNode)
 
         # Buttons
@@ -89,7 +92,7 @@ class NodesBrowser(QtWidgets.QWidget):
         delete.setIcon(deleteIcon)
 
         # Set layout
-        grid.addWidget(filterList, 1, 1, 1, 1)
+        grid.addWidget(self.filterList, 1, 1, 1, 1)
         grid.addWidget(self.treeView, 2, 1, 4, 4)
         grid.addWidget(refresh, 6, 1, 1, 4)
         grid.addWidget(copy, 7, 1, 1, 1)
@@ -105,7 +108,7 @@ class NodesBrowser(QtWidgets.QWidget):
 
         # Connect custom signals
         self.removeSignal.connect(self.model.removeData)
-
+        self.updateFilterList.connect(filterModel.updateData)
 
     @QtCore.Slot(str)
     def onFilterChanged(self, text):
@@ -157,6 +160,8 @@ class NodesBrowser(QtWidgets.QWidget):
                                                             utils.path + nodeType + '/' + name + utils.extension)])}
 
                 self.exportNode(selectedNodes, self.newNodeData)
+                self.filterList.setCurrentIndex(0)
+                self.updateFilterList.emit()
 
     def selectedNode(self, selected, deselected):
         index = selected.indexes()
@@ -194,12 +199,14 @@ class NodesBrowser(QtWidgets.QWidget):
                 nodePath = data['Categories'][parent][selectionData][-1]
                 nodes = self.proxyModel.mapToSource(selection).internalPointer()
                 # nodes = selection.internalPointer()
-                node = treemodel.Node(nodes, selection.parent())
+                node = treemodel.Node(nodes, self.proxyModel.mapToSource(selection.parent()))
+
+                self.removeSignal.emit(node)
 
                 # Update json
                 del data['Categories'][parent][selectionData]
-                keys = ['user', 'date', 'comment', 'Node Path']
                 utils.updateJson(data, jsonPath)
 
-                self.removeSignal.emit(node)
+                self.filterList.setCurrentIndex(0)
+                self.updateFilterList.emit()
                 os.remove(nodePath)

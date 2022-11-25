@@ -1,16 +1,6 @@
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtWidgets, QtGui
 from . import utils
 import os
-
-
-# class Headers(QtWidgets.QHeaderView):
-#     def __init__(self, orientation):
-#         super(Headers, self).__init__(orientation)
-#         self.setStretchLastSection(True)
-#
-#     def mousePressEvent(self, e):
-#         if e.button() == QtCore.Qt.LeftButton:
-#             print('Left clicked')
 
 
 class NodeItem(object):
@@ -151,12 +141,10 @@ class NodeModel(QtCore.QAbstractItemModel):
         if category not in children:
             node = NodeItem(category, self.rootItem)
             nodeExport = NodeItem(list(data[category].values()), node)
-            self.beginResetModel()
             self.beginInsertRows(QtCore.QModelIndex(), rows, rows)
             self.rootItem.appendChild(node)
             node.appendChild(nodeExport)
             self.endInsertRows()
-            self.endResetModel()
         else:
             nodeType = list(data.keys())[0]
             parent = self.match(self.index(0, 0, QtCore.QModelIndex()), 0, nodeType, 1)
@@ -165,25 +153,23 @@ class NodeModel(QtCore.QAbstractItemModel):
                 parentNode = parentIndex.internalPointer()
                 rows = parentNode.childCount()
                 dataNode = NodeItem(list(data[category].values()), parentNode)
-                self.beginResetModel()
                 self.beginInsertRows(parentIndex, rows, rows)
                 parentNode.appendChild(dataNode)
                 self.endInsertRows()
-                self.endResetModel()
+
 
     @QtCore.Slot(object)
     def removeData(self, node):
         nodedata = node.node
-        # nodeIndex = self.index(nodedata.row(), 0, QtCore.QModelIndex())
         row = nodedata.row()
         parent = nodedata.parent()
-        self.beginResetModel()
         self.beginRemoveRows(node.parent, row, row)
         parent.removeChild(nodedata)
         self.endRemoveRows()
-        self.endResetModel()
+
         if parent.childCount() == 0:
-            self.beginRemoveRows(QtCore.QModelIndex(), 0, 0)
+            row = parent.row()
+            self.beginRemoveRows(QtCore.QModelIndex(), row, row)
             self.rootItem.removeChild(parent)
             self.endRemoveRows()
             os.remove(f"{utils.path}{parent.data(0)}_nodes.json")
@@ -207,7 +193,7 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
         pattern = self.filterRegExp().pattern()
         model = self.sourceModel()
         sourceData = model.index(source_row, 1, source_parent).data()
-        if pattern == '':
+        if pattern == '' or pattern == 'All':
             return True
         elif sourceData in pattern:
             return True
