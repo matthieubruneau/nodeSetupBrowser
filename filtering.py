@@ -34,7 +34,7 @@ class ListModel(QtCore.QAbstractListModel):
 
     @QtCore.Slot()
     def updateData(self):
-        print('received')
+        # print('received')
         data = utils.deserialize(utils.path)
         self._data = self.initData(data['Categories'])
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex(), QtGui.QVector3D())

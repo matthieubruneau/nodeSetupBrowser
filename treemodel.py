@@ -151,6 +151,8 @@ class NodeModel(QtCore.QAbstractItemModel):
             if len(parent) != 0:
                 parentIndex = parent[0]
                 parentNode = parentIndex.internalPointer()
+                if list(data[category].values())[0] in [child.data(0) for child in parentNode.childItems]:
+                    return
                 rows = parentNode.childCount()
                 dataNode = NodeItem(list(data[category].values()), parentNode)
                 self.beginInsertRows(parentIndex, rows, rows)
