@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtWidgets, QtGui
+from PySide2 import QtCore
 from . import utils
 import os
 
@@ -158,7 +158,6 @@ class NodeModel(QtCore.QAbstractItemModel):
                 self.beginInsertRows(parentIndex, rows, rows)
                 parentNode.appendChild(dataNode)
                 self.endInsertRows()
-
 
     @QtCore.Slot(object)
     def removeData(self, node):
