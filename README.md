@@ -10,7 +10,7 @@ https://vimeo.com/777696262
 1. Clone the repository and put it into a folder called "python3.9libs" located in your preference directory.
 If you don't have one, you can create one.
 
-2. Then, go to python_panel, create a new panel and type this code in the script window:
+2. Then, inside of Houdini, go to windows -> python panel editor, create a new panel and type this code in the script window:
 ```
 from NodesBrowser import nodesbrowser, utils, treemodel, filtering
 from PySide2 import QtWidgets
@@ -19,4 +19,5 @@ def createInterface():
     return nodesbrowser.NodesBrowser()
 ```
 
+3. You should now get a new pythonPanel which will show you the interface as shown in the video.
 
