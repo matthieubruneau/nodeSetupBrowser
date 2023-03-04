@@ -54,7 +54,7 @@ class NodeModel(QtCore.QAbstractItemModel):
         super(NodeModel, self).__init__(parent)
         tmpNode = NodeItem("")
         self.rootItem = NodeItem("Root", tmpNode)
-        data = utils.deserialize(utils.path)
+        data = utils.deserialize(utils.PATH)
         self.setupModelData(self.rootItem, data['Categories'])
         self.columnsHeader = ['', 'User', 'Date', 'Description']
 
@@ -173,7 +173,7 @@ class NodeModel(QtCore.QAbstractItemModel):
             self.beginRemoveRows(QtCore.QModelIndex(), row, row)
             self.rootItem.removeChild(parent)
             self.endRemoveRows()
-            os.remove(f"{utils.path}{parent.data(0)}_nodes.json")
+            os.remove(f"{utils.PATH}{parent.data(0)}_nodes.json")
 
     def setupModelData(self, parent, d):
         for key, value in d.items():

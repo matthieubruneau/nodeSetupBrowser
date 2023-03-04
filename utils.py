@@ -2,7 +2,7 @@ import json
 import os
 import hou
 
-path = "D:/Projets_Houdini/CopiedSetup/"
+PATH = "D:/Projets_Houdini/CopiedSetup/"
 extension = '.uti'
 
 
@@ -38,7 +38,7 @@ def updateJson(newData, filePath):
 
 def serialize(data):
     nodeName = list(data.keys())[0]
-    jsonFilePath = "{}{}_nodes.json".format(path, nodeName)
+    jsonFilePath = "{}{}_nodes.json".format(PATH, nodeName)
     writeJson(data, jsonFilePath)
 
 
