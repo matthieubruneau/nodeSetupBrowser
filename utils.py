@@ -39,7 +39,7 @@ def updateJson(newData, filePath):
 
 def serialize(data):
     nodeName = list(data.keys())[0]
-    jsonFilePath = "{}{}_nodes.json".format(PATH, nodeName)
+    jsonFilePath = "{}{}_nodes.json".format(LOCATION_PATH, nodeName)
     writeJson(data, jsonFilePath)
 
 
