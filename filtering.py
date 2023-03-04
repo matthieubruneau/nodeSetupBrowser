@@ -11,7 +11,7 @@ class CheckableComboBox(QtWidgets.QComboBox):
 class ListModel(QtCore.QAbstractListModel):
     def __init__(self):
         super(ListModel, self).__init__()
-        data = utils.deserialize(utils.PATH)
+        data = utils.deserialize(utils.LOCATION_PATH)
         self._data = self.initData(data['Categories'])
 
     def rowCount(self, parent=QtCore.QModelIndex):
@@ -35,7 +35,7 @@ class ListModel(QtCore.QAbstractListModel):
     @QtCore.Slot()
     def updateData(self):
         # print('received')
-        data = utils.deserialize(utils.PATH)
+        data = utils.deserialize(utils.LOCATION_PATH)
         self._data = self.initData(data['Categories'])
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex(), QtGui.QVector3D())
 

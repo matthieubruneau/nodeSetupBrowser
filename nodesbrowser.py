@@ -133,11 +133,11 @@ class NodesBrowser(QtWidgets.QWidget):
         parentNode = nodes[0].parent()
         nodeType = list(nodeData.keys())[0]
 
-        path = utils.PATH + nodeType + '/' + nodeData[nodeType]['name'] + utils.extension
+        path = utils.LOCATION_PATH + nodeType + '/' + nodeData[nodeType]['name'] + utils.extension
         utils.serialize(nodeData)
 
-        if not os.path.exists(utils.PATH + nodeType):
-            os.makedirs(utils.PATH + nodeType)
+        if not os.path.exists(utils.LOCATION_PATH + nodeType):
+            os.makedirs(utils.LOCATION_PATH + nodeType)
 
         parentNode.saveItemsToFile(nodes, path)
 
@@ -157,7 +157,7 @@ class NodesBrowser(QtWidgets.QWidget):
                                                            ('date', date.today().strftime("%m/%d/%y")),
                                                            ('comment', self.addNode.metadata.toPlainText()),
                                                            ('Node Path',
-                                                            utils.PATH + nodeType + '/' + name + utils.extension)])}
+                                                            utils.LOCATION_PATH + nodeType + '/' + name + utils.extension)])}
 
                 self.exportNode(selectedNodes, self.newNodeData)
                 self.filterList.setCurrentIndex(0)
@@ -169,7 +169,7 @@ class NodesBrowser(QtWidgets.QWidget):
             selectionData = index[0].data()
             parent = index[0].parent().data()
             if parent is not None and parent != 'Categories':
-                data = utils.deserialize(utils.PATH)
+                data = utils.deserialize(utils.LOCATION_PATH)
         except IndexError or KeyError:
             pass
 
@@ -180,7 +180,7 @@ class NodesBrowser(QtWidgets.QWidget):
 
         path = None
         if parent is not None:
-            data = utils.deserialize(utils.PATH)
+            data = utils.deserialize(utils.LOCATION_PATH)
             path = data['Categories'][parent][selectionData][-1]
             tab = utils.getCurrentNetworkTab()
             parent = tab.pwd()
@@ -193,7 +193,7 @@ class NodesBrowser(QtWidgets.QWidget):
             parent = selection.parent().data(0)
 
             if parent is not None:
-                jsonPath = f"{utils.PATH}{parent}_nodes.json"
+                jsonPath = f"{utils.LOCATION_PATH}{parent}_nodes.json"
                 data = utils.deserialize(jsonPath, allType=False)
 
                 nodePath = data['Categories'][parent][selectionData][-1]

@@ -2,7 +2,8 @@ import json
 import os
 import hou
 
-PATH = "D:/Projets_Houdini/CopiedSetup/"
+# Set global storing location
+LOCATION_PATH = "D:/Projets_Houdini/CopiedSetup/"
 extension = '.uti'
 
 

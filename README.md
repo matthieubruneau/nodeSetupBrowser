@@ -9,7 +9,7 @@ https://vimeo.com/777696262
 ## Installation
 1. Clone the repository and put it into a folder called "python3.9libs" located in your preference directory.
 If you don't have one, you can create one.
-2. Set the PATH variable in the utils.py to where you want the files to be stored. It can be a network location or a 
+2. Set the LOCATION_PATH variable in the utils.py to where you want the files to be stored. It can be a network location or a 
 local one
 3. Then, inside of Houdini, go to windows -> python panel editor, create a new panel and type this code in the script window:
 ```
